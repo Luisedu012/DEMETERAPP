@@ -1,0 +1,108 @@
+name: demeterapp
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State Management
+  flutter_riverpod: ^3.0.0
+  riverpod_annotation: ^3.0.0
+
+  # Environment Variables
+  envied: ^1.2.1
+
+  # HTTP Client
+  dio: ^5.9.0
+
+  # UI & Animations
+  loading_animation_widget: ^1.3.0
+  shimmer: ^3.0.0
+
+  # Forms & Validation
+  validatorless: ^1.2.5
+  mask_text_input_formatter: ^2.9.0
+
+  # Notifications
+  top_snackbar_flutter: ^3.3.0
+
+  # Local Storage
+  sqflite: ^2.4.2
+  shared_preferences: ^2.5.3
+  path: ^1.9.1
+
+  # Images
+  cached_network_image: ^3.4.1
+  image: ^4.1.7
+
+  # Camera
+  camera: ^0.10.5+9
+  permission_handler: ^11.3.0
+  image_picker: ^1.0.7
+  path_provider: ^2.1.2
+
+  # Utilities
+  uuid: ^4.5.1
+  connectivity_plus: ^7.0.0
+  intl: ^0.20.2
+  url_launcher: ^6.3.2
+  package_info_plus: ^9.0.0
+
+  # Nota: Fontes agora são locais (assets/fonts/)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+  build_runner: ^2.7.1
+  custom_lint: ^0.8.0
+  riverpod_generator: ^3.0.0
+  riverpod_lint: ^3.0.0
+  envied_generator: ^1.2.1
+  flutter_launcher_icons: ^0.14.2
+
+flutter:
+  uses-material-design: true
+
+  # Assets do aplicativo
+  assets:
+    - assets/images/
+    - assets/figma/
+
+  # Fontes locais
+  fonts:
+    # Fonte serifada - Para logo e títulos especiais
+    - family: Cinzel
+      fonts:
+        - asset: assets/fonts/Cinzel-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Cinzel-Bold.ttf
+          weight: 700
+
+    # Fonte sans-serif - Para todo o resto do app
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+
+# Configuração do ícone do app
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo_demeter.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/logo_demeter.png"
+  remove_alpha_ios: true
