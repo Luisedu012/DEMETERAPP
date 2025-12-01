@@ -41,7 +41,7 @@ final class RegisterViewModelProvider
   }
 }
 
-String _$registerViewModelHash() => r'7059391ef662323e90b66adf47a19fbabc873690';
+String _$registerViewModelHash() => r'3fd4e6e31ec8489331ca50e3bffa1b864a83ad5f';
 
 abstract class _$RegisterViewModel extends $Notifier<RegisterState> {
   RegisterState build();
