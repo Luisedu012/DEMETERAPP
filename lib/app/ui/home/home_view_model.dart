@@ -65,6 +65,7 @@ class HomeState {
 class HomeViewModel extends _$HomeViewModel {
   @override
   HomeState build() {
+    ref.watch(authProvider);
     loadData();
     return HomeState.initial();
   }
