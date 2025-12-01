@@ -27,6 +27,12 @@ class ClassificationRepository {
         data: formData,
       );
 
+      print('🔍 DIAGNÓSTICO - Resposta do Backend (createClassification):');
+      print('📦 response.data completo: ${response.data}');
+      print('📝 grain_type recebido: ${response.data['grain_type']}');
+      print('📊 confidence_score recebido: ${response.data['confidence_score']}');
+      print('📂 extra_data recebido: ${response.data['extra_data']}');
+
       return ClassificationModel.fromJson(response.data);
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
@@ -48,7 +54,14 @@ class ClassificationRepository {
         queryParameters: queryParams,
       );
 
+      print('🔍 DIAGNÓSTICO - Resposta do Backend (getClassifications):');
       final List<dynamic> data = response.data['items'] ?? response.data;
+      print('📊 Total de itens recebidos: ${data.length}');
+      if (data.isNotEmpty) {
+        print('📝 Primeiro item grain_type: ${data[0]['grain_type']}');
+        print('📦 Primeiro item completo: ${data[0]}');
+      }
+
       return data.map((json) => ClassificationModel.fromJson(json)).toList();
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
@@ -59,6 +72,13 @@ class ClassificationRepository {
   Future<ClassificationModel> getClassificationById(int id) async {
     try {
       final response = await _apiClient.get('/api/v1/classifications/$id');
+
+      print('🔍 DIAGNÓSTICO - Resposta do Backend (getClassificationById $id):');
+      print('📦 response.data completo: ${response.data}');
+      print('📝 grain_type recebido: ${response.data['grain_type']}');
+      print('📊 confidence_score recebido: ${response.data['confidence_score']}');
+      print('📂 extra_data recebido: ${response.data['extra_data']}');
+
       return ClassificationModel.fromJson(response.data);
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);

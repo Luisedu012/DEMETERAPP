@@ -68,6 +68,7 @@ class ClassificationsState {
     bool? hasMore,
     String? errorMessage,
     DateTimeRange? dateRange,
+    bool clearDateRange = false,
   }) {
     return ClassificationsState(
       status: status ?? this.status,
@@ -75,7 +76,7 @@ class ClassificationsState {
       currentPage: currentPage ?? this.currentPage,
       hasMore: hasMore ?? this.hasMore,
       errorMessage: errorMessage,
-      dateRange: dateRange ?? this.dateRange,
+      dateRange: clearDateRange ? null : (dateRange ?? this.dateRange),
     );
   }
 }
@@ -91,8 +92,6 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
   }
 
   Future<void> loadClassifications() async {
-    state = ClassificationsState.loading();
-
     try {
       final repository = ref.read(classificationRepositoryProvider);
       final classifications = await repository.getClassifications(
@@ -100,7 +99,7 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
         skip: 0,
       );
 
-      final items = classifications
+      var items = classifications
           .map((c) => ClassificationListItem(
                 id: c.id,
                 grainType: c.grainType,
@@ -109,15 +108,35 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
               ))
           .toList();
 
+      if (state.dateRange != null) {
+        items = items.where((item) {
+          final start = DateTime(
+            state.dateRange!.start.year,
+            state.dateRange!.start.month,
+            state.dateRange!.start.day,
+          );
+          final end = DateTime(
+            state.dateRange!.end.year,
+            state.dateRange!.end.month,
+            state.dateRange!.end.day,
+            23,
+            59,
+            59,
+          );
+          return item.timestamp.isAfter(start.subtract(const Duration(seconds: 1))) &&
+                 item.timestamp.isBefore(end.add(const Duration(seconds: 1)));
+        }).toList();
+      }
+
       if (items.isEmpty) {
-        state = ClassificationsState(
+        state = state.copyWith(
           status: ClassificationsStatus.empty,
           items: [],
           currentPage: 0,
           hasMore: false,
         );
       } else {
-        state = ClassificationsState(
+        state = state.copyWith(
           status: ClassificationsStatus.loaded,
           items: items,
           currentPage: 1,
@@ -125,7 +144,7 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
         );
       }
     } on ApiException catch (e) {
-      state = ClassificationsState(
+      state = state.copyWith(
         status: ClassificationsStatus.error,
         items: [],
         currentPage: 0,
@@ -133,7 +152,7 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
         errorMessage: e.userFriendlyMessage,
       );
     } catch (e) {
-      state = ClassificationsState(
+      state = state.copyWith(
         status: ClassificationsStatus.error,
         items: [],
         currentPage: 0,
@@ -144,7 +163,9 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
   }
 
   Future<void> loadMore() async {
-    if (!state.hasMore || state.status == ClassificationsStatus.loadingMore) {
+    if (!state.hasMore ||
+        state.status == ClassificationsStatus.loadingMore ||
+        state.status == ClassificationsStatus.refreshing) {
       return;
     }
 
@@ -157,7 +178,7 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
         skip: state.currentPage * itemsPerPage,
       );
 
-      final newItems = classifications
+      var newItems = classifications
           .map((c) => ClassificationListItem(
                 id: c.id,
                 grainType: c.grainType,
@@ -165,6 +186,26 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
                 timestamp: c.createdAt,
               ))
           .toList();
+
+      if (state.dateRange != null) {
+        newItems = newItems.where((item) {
+          final start = DateTime(
+            state.dateRange!.start.year,
+            state.dateRange!.start.month,
+            state.dateRange!.start.day,
+          );
+          final end = DateTime(
+            state.dateRange!.end.year,
+            state.dateRange!.end.month,
+            state.dateRange!.end.day,
+            23,
+            59,
+            59,
+          );
+          return item.timestamp.isAfter(start.subtract(const Duration(seconds: 1))) &&
+                 item.timestamp.isBefore(end.add(const Duration(seconds: 1)));
+        }).toList();
+      }
 
       final allItems = [...state.items, ...newItems];
 
@@ -197,7 +238,7 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
         skip: 0,
       );
 
-      final items = classifications
+      var items = classifications
           .map((c) => ClassificationListItem(
                 id: c.id,
                 grainType: c.grainType,
@@ -205,6 +246,26 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
                 timestamp: c.createdAt,
               ))
           .toList();
+
+      if (state.dateRange != null) {
+        items = items.where((item) {
+          final start = DateTime(
+            state.dateRange!.start.year,
+            state.dateRange!.start.month,
+            state.dateRange!.start.day,
+          );
+          final end = DateTime(
+            state.dateRange!.end.year,
+            state.dateRange!.end.month,
+            state.dateRange!.end.day,
+            23,
+            59,
+            59,
+          );
+          return item.timestamp.isAfter(start.subtract(const Duration(seconds: 1))) &&
+                 item.timestamp.isBefore(end.add(const Duration(seconds: 1)));
+        }).toList();
+      }
 
       state = state.copyWith(
         status: ClassificationsStatus.loaded,
@@ -229,10 +290,12 @@ class ClassificationsViewModel extends _$ClassificationsViewModel {
     state = state.copyWith(
       dateRange: range,
       status: ClassificationsStatus.initial,
+      items: [],
+      currentPage: 0,
+      hasMore: true,
+      clearDateRange: range == null,
     );
 
-    // Por enquanto recarregar todos
-    // TODO: Implementar filtro por data na API
     await loadClassifications();
   }
 }

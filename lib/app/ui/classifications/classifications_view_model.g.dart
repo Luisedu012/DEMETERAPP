@@ -42,7 +42,7 @@ final class ClassificationsViewModelProvider
 }
 
 String _$classificationsViewModelHash() =>
-    r'e872bd504e54fc8b3110ceedb4c3d7c5842adf73';
+    r'45630e18b7a6c4c0547857249d50114f24150ba8';
 
 abstract class _$ClassificationsViewModel
     extends $Notifier<ClassificationsState> {

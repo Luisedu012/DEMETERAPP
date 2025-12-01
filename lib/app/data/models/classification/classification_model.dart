@@ -1,3 +1,5 @@
+import 'package:demeterapp/app/core/config/env.dart';
+
 class ClassificationModel {
   final int id;
   final int userId;
@@ -61,6 +63,16 @@ class ClassificationModel {
   Map<String, dynamic>? get defects => extraData?['defects'];
   int? get totalDefects => defects?['total'];
   double? get defectPercentage => defects?['percentage'];
+
+  /// Retorna a URL completa da imagem concatenando base URL + caminho relativo
+  String get fullImageUrl {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    final baseUrl = Env.apiBaseUrl;
+    final cleanPath = imagePath.startsWith('/') ? imagePath : '/$imagePath';
+    return '$baseUrl$cleanPath';
+  }
 
   String get qualityLevel {
     final percentage = defectPercentage ?? 0.0;

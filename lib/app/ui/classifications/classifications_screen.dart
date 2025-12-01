@@ -268,7 +268,6 @@ class _CustomHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 160,
       decoration: BoxDecoration(
         color: AppColors.white,
         boxShadow: [
@@ -302,16 +301,16 @@ class _CustomHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Todas as classificações',
+                dateRange != null ? 'Classificações filtradas' : 'Todas as classificações',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.greyDark,
+                  color: dateRange != null ? AppColors.primary : AppColors.greyDark,
                 ),
               ),
             ),
@@ -370,15 +369,15 @@ class _DateRangeSelector extends StatelessWidget {
               ),
             ),
             if (dateRange != null)
-              InkWell(
-                onTap: () {
-                  onClear();
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: const Icon(
-                  Icons.close,
-                  color: AppColors.greyMedium,
-                  size: 20,
+              GestureDetector(
+                onTap: onClear,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: const Icon(
+                    Icons.close,
+                    color: AppColors.greyMedium,
+                    size: 20,
+                  ),
                 ),
               ),
           ],
