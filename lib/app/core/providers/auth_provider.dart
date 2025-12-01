@@ -235,4 +235,20 @@ class Auth extends _$Auth {
       );
     }
   }
+
+  /// Recarrega os dados do usuário da API
+  Future<void> reloadUser() async {
+    try {
+      final user = await _authRepository.getCurrentUser();
+
+      if (!ref.mounted) return;
+
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: user,
+      );
+    } catch (e) {
+      // Mantém usuário atual em caso de erro
+    }
+  }
 }

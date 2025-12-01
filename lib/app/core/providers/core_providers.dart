@@ -4,6 +4,7 @@ import 'package:demeterapp/app/core/rest_client/api_client.dart';
 import 'package:demeterapp/app/data/services/token_storage_service.dart';
 import 'package:demeterapp/app/data/repositories/auth_repository.dart';
 import 'package:demeterapp/app/data/repositories/classification_repository.dart';
+import 'package:demeterapp/app/data/repositories/user_repository.dart';
 
 final tokenStorageServiceProvider = Provider<TokenStorageService>((ref) {
   return TokenStorageService();
@@ -34,4 +35,10 @@ final classificationRepositoryProvider = Provider<ClassificationRepository>((
   final apiClient = ref.watch(apiClientProvider);
 
   return ClassificationRepository(apiClient: apiClient);
+});
+
+final userRepositoryProvider = Provider<UserRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+
+  return UserRepository(apiClient: apiClient);
 });
