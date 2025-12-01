@@ -67,7 +67,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               label: 'Tentar novamente',
               textColor: AppColors.white,
               onPressed: () {
-                ref.read(profileViewModelProvider.notifier).loadProfile();
+                ref.read(profileViewModelProvider.notifier).refresh();
               },
             ),
           ),

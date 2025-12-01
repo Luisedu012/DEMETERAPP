@@ -64,41 +64,35 @@ class ProfileState {
 class ProfileViewModel extends _$ProfileViewModel {
   @override
   ProfileState build() {
-    loadProfile();
-    return ProfileState.initial();
-  }
+    final authState = ref.watch(authProvider);
 
-  Future<void> loadProfile() async {
-    state = ProfileState.loading();
+    if (authState.isLoading) {
+      return ProfileState.loading();
+    }
 
-    try {
-      final authState = ref.read(authProvider);
+    if (authState.user != null) {
+      final profile = UserProfile(
+        id: authState.user!.id,
+        name: authState.user!.name,
+        phone: authState.user!.phone,
+        email: authState.user!.email,
+        isVerified: authState.user!.isVerified,
+      );
 
-      if (authState.user != null) {
-        final profile = UserProfile(
-          id: authState.user!.id,
-          name: authState.user!.name,
-          phone: authState.user!.phone,
-          email: authState.user!.email,
-          isVerified: authState.user!.isVerified,
-        );
-
-        state = ProfileState(
-          status: ProfileStatus.loaded,
-          profile: profile,
-        );
-      } else {
-        state = ProfileState(
-          status: ProfileStatus.error,
-          errorMessage: 'Usuário não autenticado',
-        );
-      }
-    } catch (e) {
-      state = ProfileState(
-        status: ProfileStatus.error,
-        errorMessage: 'Erro ao carregar perfil',
+      return ProfileState(
+        status: ProfileStatus.loaded,
+        profile: profile,
       );
     }
+
+    return ProfileState(
+      status: ProfileStatus.error,
+      errorMessage: 'Usuário não autenticado',
+    );
+  }
+
+  void refresh() {
+    ref.invalidateSelf();
   }
 
   Future<void> logout() async {
