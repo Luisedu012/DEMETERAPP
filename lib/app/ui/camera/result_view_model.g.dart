@@ -41,7 +41,7 @@ final class ResultViewModelProvider
   }
 }
 
-String _$resultViewModelHash() => r'dcbe9a1b2f9cc91d66a9276930cbb0d49def533e';
+String _$resultViewModelHash() => r'4792f270bf7e8690cb6eb75112b9c271ab85b32f';
 
 abstract class _$ResultViewModel extends $Notifier<ResultState> {
   ResultState build();
