@@ -41,7 +41,7 @@ final class CameraViewModelProvider
   }
 }
 
-String _$cameraViewModelHash() => r'79c8afc558847b76da2d7b2aeb2c15aa8faffa43';
+String _$cameraViewModelHash() => r'8c9f6a8909955549ecff8708d38388a0dbc79bb7';
 
 abstract class _$CameraViewModel extends $Notifier<CameraState> {
   CameraState build();

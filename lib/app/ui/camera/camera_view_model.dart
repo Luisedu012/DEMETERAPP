@@ -104,7 +104,6 @@ class CameraViewModel extends _$CameraViewModel {
       );
 
       await controller.initialize();
-      await controller.lockCaptureOrientation();
 
       state = state.copyWith(
         status: CameraStatus.ready,
@@ -202,7 +201,6 @@ class CameraViewModel extends _$CameraViewModel {
       );
 
       await controller.initialize();
-      await controller.lockCaptureOrientation();
 
       state = state.copyWith(
         controller: controller,
@@ -261,18 +259,9 @@ class CameraViewModel extends _$CameraViewModel {
       return imageFile;
     }
 
-    if (Platform.isAndroid && state.controller != null) {
-      final sensorOrientation =
-          state.controller!.description.sensorOrientation;
-
-      if (sensorOrientation == 90) {
-        image = img.copyRotate(image, angle: -90);
-      } else if (sensorOrientation == 270) {
-        image = img.copyRotate(image, angle: 90);
-      } else if (sensorOrientation == 180) {
-        image = img.copyRotate(image, angle: 180);
-      }
-    }
+    // Corrigir orientação baseada em EXIF
+    // A maioria das câmeras grava a orientação nos dados EXIF
+    image = img.bakeOrientation(image);
 
     final maxSize = 1920;
     img.Image resized = image;
