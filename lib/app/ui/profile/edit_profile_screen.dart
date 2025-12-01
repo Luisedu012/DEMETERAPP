@@ -23,7 +23,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _confirmPasswordController;
 
   final _phoneMaskFormatter = MaskTextInputFormatter(
-    mask: '+55 (##) #####-####',
+    mask: '(##) #####-####',
     filter: {"#": RegExp(r'[0-9]')},
   );
 
@@ -99,21 +99,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             color: AppColors.white,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: isSaving ? null : _saveProfile,
-            child: Text(
-              'Salvar',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isSaving
-                    ? AppColors.white.withValues(alpha: 0.5)
-                    : AppColors.white,
-              ),
-            ),
-          ),
-        ],
       ),
       body: Stack(
         children: [
@@ -157,10 +142,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       label: 'Nome',
       keyboardType: TextInputType.name,
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Nome é obrigatório';
-        }
-        if (value.length < 3) {
+        if (value != null && value.isNotEmpty && value.length < 3) {
           return 'Nome deve ter no mínimo 3 caracteres';
         }
         return null;
@@ -183,10 +165,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       keyboardType: TextInputType.phone,
       inputFormatters: [_phoneMaskFormatter],
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Telefone é obrigatório';
-        }
-        if (value.length < 16) {
+        if (value != null && value.isNotEmpty && value.length < 14) {
           return 'Telefone inválido';
         }
         return null;
@@ -198,15 +177,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return _PasswordField(
       controller: _currentPasswordController,
       label: 'Senha atual',
-      validator: (value) {
-        if (_newPasswordController.text.isNotEmpty ||
-            _confirmPasswordController.text.isNotEmpty) {
-          if (value == null || value.isEmpty) {
-            return 'Senha atual é obrigatória';
-          }
-        }
-        return null;
-      },
+      validator: (value) => null,
     );
   }
 
@@ -215,14 +186,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       controller: _newPasswordController,
       label: 'Nova senha',
       validator: (value) {
-        if (_currentPasswordController.text.isNotEmpty ||
-            _confirmPasswordController.text.isNotEmpty) {
-          if (value == null || value.isEmpty) {
-            return 'Nova senha é obrigatória';
-          }
-          if (value.length < 8) {
-            return 'Senha deve ter no mínimo 8 caracteres';
-          }
+        if (value != null && value.isNotEmpty && value.length < 8) {
+          return 'Senha deve ter no mínimo 8 caracteres';
         }
         return null;
       },
@@ -255,7 +220,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return SizedBox(
       height: 56,
       child: ElevatedButton(
-        onPressed: isSaving ? null : _savePasswordChanges,
+        onPressed: isSaving ? null : _saveChanges,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor:
@@ -298,27 +263,28 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  void _saveProfile() {
-    if (_formKey.currentState?.validate() ?? false) {
-      ref.read(editProfileViewModelProvider.notifier).updateProfile(
-            _nameController.text,
-            _phoneController.text,
-          );
-    }
-  }
-
-  void _savePasswordChanges() {
-    if (_currentPasswordController.text.isEmpty &&
-        _newPasswordController.text.isEmpty &&
-        _confirmPasswordController.text.isEmpty) {
-      _saveProfile();
+  void _saveChanges() {
+    if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
 
-    if (_formKey.currentState?.validate() ?? false) {
+    final editState = ref.read(editProfileViewModelProvider);
+
+    final nameChanged = _nameController.text.trim() != editState.name;
+    final phoneDigits = _phoneController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final originalPhoneDigits = editState.phone.replaceAll(RegExp(r'[^0-9]'), '');
+    final phoneChanged = phoneDigits != originalPhoneDigits;
+
+    final passwordFilled = _newPasswordController.text.isNotEmpty;
+
+    if (passwordFilled) {
       ref.read(editProfileViewModelProvider.notifier).changePassword(
-            _currentPasswordController.text,
             _newPasswordController.text,
+          );
+    } else if (nameChanged || phoneChanged) {
+      ref.read(editProfileViewModelProvider.notifier).updateProfile(
+            nameChanged ? _nameController.text.trim() : editState.name,
+            phoneChanged ? phoneDigits : originalPhoneDigits,
           );
     }
   }

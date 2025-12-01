@@ -1,4 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:demeterapp/app/core/providers/core_providers.dart';
+import 'package:demeterapp/app/core/providers/auth_provider.dart';
+import 'package:demeterapp/app/data/repositories/user_repository.dart';
+import 'package:demeterapp/app/core/exceptions/api_exception.dart';
 
 part 'edit_profile_view_model.g.dart';
 
@@ -51,42 +55,46 @@ class EditProfileState {
 
 @riverpod
 class EditProfileViewModel extends _$EditProfileViewModel {
+  late UserRepository _userRepository;
+
   @override
   EditProfileState build() {
-    loadProfile();
-    return EditProfileState.initial();
-  }
+    _userRepository = ref.read(userRepositoryProvider);
 
-  Future<void> loadProfile() async {
-    state = state.copyWith(status: EditProfileStatus.initial);
+    final authState = ref.read(authProvider);
 
-    try {
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      state = state.copyWith(
+    if (authState.user != null) {
+      return EditProfileState(
         status: EditProfileStatus.editing,
-        name: 'Luis Eduardo Rodrigues',
-        email: 'exemplo@gmail.com',
-        phone: '+24500000000',
-      );
-    } catch (e) {
-      state = state.copyWith(
-        status: EditProfileStatus.error,
-        errorMessage: 'Erro ao carregar perfil',
+        name: authState.user!.name,
+        email: authState.user!.email,
+        phone: authState.user!.phone,
       );
     }
+
+    return EditProfileState.initial();
   }
 
   Future<void> updateProfile(String name, String phone) async {
     state = state.copyWith(status: EditProfileStatus.saving);
 
     try {
-      await Future.delayed(const Duration(milliseconds: 1000));
+      await _userRepository.updateProfile(
+        name: name,
+        phone: phone,
+      );
+
+      await ref.read(authProvider.notifier).reloadUser();
 
       state = state.copyWith(
         status: EditProfileStatus.saved,
         name: name,
         phone: phone,
+      );
+    } on ApiException catch (e) {
+      state = state.copyWith(
+        status: EditProfileStatus.error,
+        errorMessage: e.userFriendlyMessage,
       );
     } catch (e) {
       state = state.copyWith(
@@ -96,16 +104,18 @@ class EditProfileViewModel extends _$EditProfileViewModel {
     }
   }
 
-  Future<void> changePassword(
-    String currentPassword,
-    String newPassword,
-  ) async {
+  Future<void> changePassword(String newPassword) async {
     state = state.copyWith(status: EditProfileStatus.saving);
 
     try {
-      await Future.delayed(const Duration(milliseconds: 1000));
+      await _userRepository.changePassword(newPassword: newPassword);
 
       state = state.copyWith(status: EditProfileStatus.saved);
+    } on ApiException catch (e) {
+      state = state.copyWith(
+        status: EditProfileStatus.error,
+        errorMessage: e.userFriendlyMessage,
+      );
     } catch (e) {
       state = state.copyWith(
         status: EditProfileStatus.error,
