@@ -58,7 +58,7 @@ final class DetailsViewModelProvider
   }
 }
 
-String _$detailsViewModelHash() => r'7fcae296f756e232dd55e82aff15eec0f09a22ac';
+String _$detailsViewModelHash() => r'5c7ac3c5f88aec8bf72039643a80bbc4a2745672';
 
 final class DetailsViewModelFamily extends $Family
     with

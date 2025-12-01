@@ -83,12 +83,15 @@ class DetailsViewModel extends _$DetailsViewModel {
       final repository = ref.read(classificationRepositoryProvider);
       final classification = await repository.getClassificationById(classificationId);
 
+      final fullUrl = classification.fullImageUrl;
+      print('🖼️ Image URL gerada: $fullUrl');
+
       final details = ClassificationDetails(
         id: classification.id,
         grainType: classification.grainType,
         confidence: classification.confidenceScore ?? 0.0,
         timestamp: classification.createdAt,
-        imagePath: classification.imagePath,
+        imagePath: fullUrl,
         grainsDetected: classification.totalGrains,
         totalDefects: classification.totalDefects,
         defectPercentage: classification.defectPercentage,

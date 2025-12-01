@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:demeterapp/app/core/themes/app_colors.dart';
 import 'package:demeterapp/app/ui/classifications/details_view_model.dart';
@@ -173,101 +171,29 @@ class _DetailsModalState extends ConsumerState<_DetailsModal>
         color: AppColors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: AppColors.grey.withValues(alpha: 0.2),
-              child: Center(
-                child: Shimmer.fromColors(
-                  baseColor: AppColors.grey.withValues(alpha: 0.3),
-                  highlightColor: AppColors.grey.withValues(alpha: 0.1),
-                  child: const Icon(
-                    Icons.image,
-                    size: 80,
-                    color: AppColors.grey,
-                  ),
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              color: AppColors.primary,
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Carregando detalhes...',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColors.greyMedium,
               ),
             ),
-          ),
-          Expanded(
-            flex: 4,
-            child: _buildShimmerCard(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildShimmerCard() {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFFB3E9B6),
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24),
+          ],
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildShimmerRow(),
-          const SizedBox(height: 16),
-          _buildShimmerRow(),
-          const SizedBox(height: 16),
-          _buildShimmerRow(),
-          const SizedBox(height: 16),
-          _buildShimmerRow(),
-          const Spacer(),
-          Center(
-            child: Shimmer.fromColors(
-              baseColor: const Color(0xFF2E5C2E).withValues(alpha: 0.5),
-              highlightColor: const Color(0xFF2E5C2E).withValues(alpha: 0.1),
-              child: Container(
-                width: 100,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2E5C2E),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
-  Widget _buildShimmerRow() {
-    return Shimmer.fromColors(
-      baseColor: const Color(0xFF2E5C2E).withValues(alpha: 0.3),
-      highlightColor: const Color(0xFF2E5C2E).withValues(alpha: 0.1),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            width: 120,
-            height: 20,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2E5C2E),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          Container(
-            width: 80,
-            height: 20,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2E5C2E),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildErrorState() {
     return Container(
@@ -315,112 +241,34 @@ class _DetailsModalState extends ConsumerState<_DetailsModal>
       width: double.infinity,
       height: screenHeight * 0.85,
       decoration: const BoxDecoration(
-        color: AppColors.black,
+        color: AppColors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
           Expanded(
-            flex: 6,
-            child: _buildImage(details),
-          ),
-          Expanded(
-            flex: 4,
-            child: _buildInfoCard(details, formattedDate),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImage(ClassificationDetails details) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      child: CachedNetworkImage(
-        imageUrl: details.imagePath,
-        width: double.infinity,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => Container(
-          color: AppColors.grey.withValues(alpha: 0.2),
-          child: const Center(
-            child: CircularProgressIndicator(
-              color: AppColors.primary,
-            ),
-          ),
-        ),
-        errorWidget: (context, url, error) => Container(
-          color: AppColors.grey.withValues(alpha: 0.2),
-          child: const Center(
-            child: Icon(
-              Icons.image_not_supported,
-              size: 64,
-              color: AppColors.greyMedium,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(ClassificationDetails details, String formattedDate) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFFB3E9B6),
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
-      ),
-      child: Column(
-        children: [
-          Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(32, 24, 32, 16),
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInfoRow('Tipo de Grão:', details.grainType),
+                  _ResultCard(details: details),
                   const SizedBox(height: 16),
-                  _buildInfoRow('Confiança:', '${details.confidence}%'),
-                  const SizedBox(height: 24),
                   _QualityBadge(details: details),
                   const SizedBox(height: 16),
                   _AISummaryCard(details: details),
                   const SizedBox(height: 24),
-                  _buildInfoRow('Data:', formattedDate),
+                  _DetailsSection(details: details, formattedDate: formattedDate),
                 ],
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
+            padding: const EdgeInsets.fromLTRB(32, 0, 32, 24),
             child: _buildBackButton(),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2E5C2E),
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF2E5C2E),
-          ),
-        ),
-      ],
     );
   }
 
@@ -434,10 +282,345 @@ class _DetailsModalState extends ConsumerState<_DetailsModal>
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF2E5C2E),
+            color: AppColors.primary,
             decoration: TextDecoration.underline,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ResultCard extends StatelessWidget {
+  final ClassificationDetails details;
+
+  const _ResultCard({required this.details});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const _CheckIcon(),
+          const SizedBox(height: 16),
+          Text(
+            details.grainType,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: AppColors.greyDark,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Confiança: ${details.confidence.toStringAsFixed(0)}%',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.greyMedium,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _ConfidenceBadge(confidence: details.confidence / 100),
+        ],
+      ),
+    );
+  }
+}
+
+class _CheckIcon extends StatelessWidget {
+  const _CheckIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 64,
+      height: 64,
+      decoration: const BoxDecoration(
+        color: AppColors.success,
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.check, color: AppColors.white, size: 40),
+    );
+  }
+}
+
+class _ConfidenceBadge extends StatelessWidget {
+  final double confidence;
+
+  const _ConfidenceBadge({required this.confidence});
+
+  Color get badgeColor {
+    if (confidence > 0.9) return AppColors.success;
+    if (confidence >= 0.7) return AppColors.alert;
+    return AppColors.error;
+  }
+
+  String get badgeText {
+    if (confidence > 0.9) return 'Excelente';
+    if (confidence >= 0.7) return 'Bom';
+    return 'Baixo';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: badgeColor.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: badgeColor, width: 1.5),
+      ),
+      child: Text(
+        badgeText,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: badgeColor,
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailsSection extends StatelessWidget {
+  final ClassificationDetails details;
+  final String formattedDate;
+
+  const _DetailsSection({
+    required this.details,
+    required this.formattedDate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Detalhes',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.brown,
+          ),
+        ),
+        const SizedBox(height: 16),
+        if (details.grainsDetected != null) ...[
+          _DetailItem(
+            label: 'Grãos detectados',
+            value: details.grainsDetected.toString(),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (details.defectPercentage != null) ...[
+          _DetailItem(
+            label: 'Defeitos',
+            value: '${details.defectPercentage!.toStringAsFixed(1)}%',
+          ),
+          const SizedBox(height: 12),
+        ],
+        _DetailItem(label: 'Data', value: formattedDate),
+      ],
+    );
+  }
+}
+
+class _DetailItem extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _DetailItem({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 6,
+          height: 6,
+          decoration: const BoxDecoration(
+            color: AppColors.primary,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          '$label: ',
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.greyMedium,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.greyDark,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _QualityBadge extends StatelessWidget {
+  final ClassificationDetails details;
+
+  const _QualityBadge({required this.details});
+
+  @override
+  Widget build(BuildContext context) {
+    final percentage = details.defectPercentage ?? 0.0;
+    final quality = percentage < 20
+        ? 'EXCELENTE'
+        : percentage < 50
+        ? 'REGULAR'
+        : 'RUIM';
+    final color = percentage < 20
+        ? AppColors.success
+        : percentage < 50
+        ? AppColors.alert
+        : AppColors.error;
+    final icon = percentage < 20
+        ? Icons.check_circle
+        : percentage < 50
+        ? Icons.warning
+        : Icons.error;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color, width: 2),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 32),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  quality,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+                Text(
+                  '${percentage.toStringAsFixed(1)}% defeitos',
+                  style: TextStyle(fontSize: 14, color: color),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AISummaryCard extends StatefulWidget {
+  final ClassificationDetails details;
+
+  const _AISummaryCard({required this.details});
+
+  @override
+  State<_AISummaryCard> createState() => _AISummaryCardState();
+}
+
+class _AISummaryCardState extends State<_AISummaryCard> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = widget.details.llmSummary;
+
+    if (summary == null || summary.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => setState(() => _isExpanded = !_isExpanded),
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.psychology,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Análise da IA',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.greyDark,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: AppColors.greyMedium,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Text(
+                summary,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.greyDark,
+                  height: 1.5,
+                ),
+              ),
+            ),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 300),
+          ),
+        ],
       ),
     );
   }
